@@ -13,6 +13,10 @@ final int SOIL_COL_COUNT = 8;
 final int SOIL_ROW_COUNT = 24;
 final int SOIL_SIZE = 80;
 
+final int SOLDIER_Y = 160;
+final int BLOCK = 80;
+
+
 int[][] soilHealth;
 
 final int START_BUTTON_WIDTH = 144;
@@ -22,6 +26,9 @@ final int START_BUTTON_Y = 360;
 
 float[] cabbageX, cabbageY, soldierX, soldierY;
 float soldierSpeed = 2f;
+int randRobot,randSoldier;
+float hogMoveX,hogMoveY;
+
 
 float playerX, playerY;
 int playerCol, playerRow;
@@ -40,6 +47,10 @@ int playerMoveDuration = 15;
 int stone1Tmp=2;
 int stone2Tmp=1;
 int noSoil=0;
+
+//life
+boolean newLife = false;
+int newLifeX;
 int heartNum;
 float heartY = 10 ;
 
@@ -114,12 +125,25 @@ void setup() {
       }
     }
    
-    //Initialize heart
-         heartNum = 2;
-         heartY = 10;
+  //Initialize heart
+    heartNum = 2;
+    heartY = 10;
 	// Initialize soidiers and their position
+    soldierX = new float[6];
+    soldierY = new float[6];
+    for( int i=0 ; i<6 ; i++ ){
+      soldierY[i] = (floor(random(0,4))+i*4)*BLOCK;
+      soldierX[i] = floor(random(0,8))*BLOCK;
+    }
 
 	// Initialize cabbages and their position
+    cabbageY = new float[6];
+    cabbageX = new float[6];
+    for( int i=0 ; i<6 ; i++ ){
+      cabbageX[i] = floor(random(0,8))*BLOCK;
+      cabbageY[i] = (floor(random(0,4))+i*4)*BLOCK;
+    }
+   
 
 }
 
@@ -232,8 +256,25 @@ void draw() {
 			}//for j
 		}//for i
 
+
+
 		// Cabbages
 		// > Remember to check if playerHealth is smaller than PLAYER_MAX_HEALTH!
+    //cabbage  newlife
+    for( int i=0 ; i<6 ; i++ ){
+      if( !newLife ){
+        image( cabbage,cabbageX[i],cabbageY[i] );
+        
+        if( playerX>=cabbageX[i] && playerX<(cabbageX[i]+BLOCK) ){
+          if( playerY==cabbageY[i] ){
+            if( heartNum!=5 ){
+              cabbageX[i]=-100;
+              heartNum ++;
+            }
+          }
+         }
+      }
+    }
 
 		// Groundhog
 
@@ -360,29 +401,41 @@ void draw() {
 		// > Remember to recalculate playerCol/playerRow when you reset playerX/playerY!
 		// > Remember to reset the soil under player's original position!
     //meet soldier lose heart
-    /*
-    if( hogY==soldierY ){
-      
-      if( (hogX+BLOCK) > (soldierX+BLOCK) && hogX < (soldierX+BLOCK)  ){
-        heartNum --;
-        hogX = ROG_START_X;
-        hogY = ROG_START_Y;
-        
-        heartY = 10;
-      }
-      if( (hogX+BLOCK) > soldierX && hogX < soldierX  ){
-        heartNum --;
-        hogX = ROG_START_X;
-        hogY = ROG_START_Y;
-        
-        pageY=0;
-        pageCamera = 0;
-        heartY = 10;
-        camera = false;
-      }
-    }
     
-*/
+     //soldiers
+    for( int i=0 ; i<6 ; i++ ){
+      image( soldier, soldierX[i] ,soldierY[i] );
+      soldierX[i] += soldierSpeed;
+      
+      if( soldierX[i]>640 ){
+        soldierX[i] = -100;
+      }
+      
+      if( playerY==soldierY[i] ){
+      
+        if( (playerX+BLOCK) > (soldierX[i]+BLOCK) && playerX < (soldierX[i]+BLOCK)  ){
+          heartNum --;
+          playerX = PLAYER_INIT_X;
+          playerY = PLAYER_INIT_Y;
+          playerCol = (int) (playerX / SOIL_SIZE);
+          playerRow = (int) (playerY / SOIL_SIZE);
+          
+          heartY = 10;
+        }
+        if( (playerX+BLOCK) > soldierX[i] && playerX < soldierX[i]  ){
+          heartNum --;
+          playerX = PLAYER_INIT_X;
+          playerY = PLAYER_INIT_Y;
+          playerCol = (int) (playerX / SOIL_SIZE);
+          playerRow = (int) (playerY / SOIL_SIZE);
+          
+          heartY = 10;
+        }
+    }
+    }
+
+    
+
 		// Demo mode: Show the value of soilHealth on each soil
 		// (DO NOT CHANGE THE CODE HERE!)
 
@@ -460,8 +513,16 @@ void draw() {
          heartNum = 2;
          heartY = 10;
 				// Initialize soidiers and their position
+        for( int i=0 ; i<6 ; i++ ){
+          soldierY[i] = (floor(random(0,4))+i*4)*BLOCK;
+          soldierX[i] = floor(random(0,8))*BLOCK;
+        }
 
 				// Initialize cabbages and their position
+        for( int i=0 ; i<6 ; i++ ){
+          cabbageX[i] = floor(random(0,8))*BLOCK;
+          cabbageY[i] = (floor(random(0,4))+i*4)*BLOCK;
+        }
 				
 			}
 
